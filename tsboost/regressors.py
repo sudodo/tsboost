@@ -307,7 +307,7 @@ class TSRegressor(object):
                     seasonality = 12
                 if self.time_step == "year":
                     seasonality = 1
-                # 予測が何期先までか（切り上げ）
+                # The length of the seasons to be predicted (ceiled)
                 stationarizer_lag = int(seasonality * np.ceil(float(horizon) / float(seasonality)))
 
             if (self.seasonality != "auto") & (self.seasonality != None):
