@@ -332,13 +332,16 @@ class TSRegressor(object):
             raise Exception('prod_mode_forced must be True or False')
 
     def fit_predict(self, data, target, date, indexes=None, cv_dates=[None], prod_mode_forced=False):
-
+        """Execute fit_predict for all prediction horizons.
+        Construct as many regressors as the length of horizons.
+        """
         self.check_data(data)
         self.target = self.check_target(target, data)
         self.date = self.check_date(date, data)
         self.indexes = self.check_indexes(indexes, data)
         self.time_step = self.detect_time_step(data, self.date)
         self.prod_mode_forced = self.check_prod_mode_forced(prod_mode_forced)
+        # construct as many regressors as the length of horizons
         self.regressors = self.get_regressors()
 
         miss_data = self.get_data_holes(data, self.date, self.target, self.indexes)
@@ -349,6 +352,7 @@ class TSRegressor(object):
 
         data_finale = pd.DataFrame()
 
+        # run fit predict for each regressor corresponding to a horizon
         for i, regressor in enumerate(self.regressors):
 
             data_origin = data.copy()
@@ -362,7 +366,9 @@ class TSRegressor(object):
                 if self.prod_mode_forced == False:
                     dates = self.adjust_cv_dates(cv_dates[:], regressor.time_step, regressor.horizon)
 
+            # Here, `dates` means cv_dates
             for date in dates:
+                print(f"date in fit_predict in Regressor {date}")
                 data_forecast = regressor.fit_predict(data_origin.copy(), data_ml.copy(), date)
                 data_finale = pd.concat([data_finale.copy(), data_forecast.copy()])
 
